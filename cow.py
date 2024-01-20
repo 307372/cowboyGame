@@ -15,8 +15,6 @@ class Cow:
         self.isUpgraded = isUpgraded
         self.movementSpeed = 2 if not self.isUpgraded else 4
 
-
-        # Load the texture only once if it's not already loaded
         if not Cow.base_texture:
             Cow.base_texture = pygame.image.load("img/cow.gif")
         if not Cow.upgraded_texture:
