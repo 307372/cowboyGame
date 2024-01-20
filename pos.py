@@ -17,5 +17,8 @@ class Pos():
     def len(self):
         return math.sqrt(self.x*self.x + self.y*self.y)
 
+    def normalized(self):
+        return Pos(self.x/self.len(), self.y/self.len())
+
     def __str__(self):
         return '(x=' + str(self.x) + ',y=' + str(self.y) + ')'

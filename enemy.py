@@ -7,8 +7,8 @@ class Enemy:
 
     def __init__(self, pos):
         self.pos = pos
-        self.width = 100
-        self.height = 100
+        self.width = 75
+        self.height = 75
         self.origin = Pos(self.width / 2, self.height / 2)
         self.range = self.width / 2
         self.movementSpeed = 2

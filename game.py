@@ -6,9 +6,12 @@ from cow import Cow
 from enemy import Enemy
 from pos import Pos
 from rock import Rock
+from bullet import Bullet
 import random
 import math
 
+pygame.font.init()
+my_font = pygame.font.SysFont('Comic Sans MS', 30)
 class Game:
     def __init__(self, screen):
         self.screen = screen
@@ -17,7 +20,8 @@ class Game:
         self.player = Player()
         self.enemies = [Enemy(self.getValidEnemySpawnLocation()) for i in range(12)]
         self.rocks = [Rock(self.getValidRockSpawnLocation()) for i in range(12)]
-
+        self.bullets = []
+        self.lastShootingDirection = Pos(0,1)
     def getValidEnemySpawnLocation(self):
         angle = random.randrange(0, 360)
         [x, y] = self.screen.get_size()
@@ -47,8 +51,12 @@ class Game:
             enemy.draw(cameraOffset)
         for rock in self.rocks:
             rock.draw(cameraOffset)
-        for cow in self.cows:
-            cow.draw(cameraOffset)
+        for bullet in self.bullets:
+            bullet.draw(cameraOffset)
+        for cowIndex in range(len(self.cows)):
+            text_surface = my_font.render(str(cowIndex), False, (0,0,0))
+            self.cows[cowIndex].draw(cameraOffset)
+            self.screen.blit(text_surface, (self.cows[cowIndex].pos.x+cameraOffset.x, self.cows[cowIndex].pos.y+cameraOffset.y))
 
     def allyAi(self):
         for i in range(len(self.cows)):
@@ -84,7 +92,7 @@ class Game:
 
 
     def getCowRingFormationPlayerOffset(self, amountOfCows, cowNumber):
-        radius = 200
+        radius = 75
         deg = 360/amountOfCows
         angle = deg*cowNumber
         return self.getUnitaryVectorFromAngle(angle) * radius
@@ -93,8 +101,8 @@ class Game:
     def getUnitaryVectorFromAngle(self, angle):
         offset = Pos(0, 0)
         if angle <= 90:
-            offset.x = math.cos(math.radians(angle))
-            offset.y = -math.sin(math.radians(angle))
+            offset.x = math.sin(math.radians(angle))
+            offset.y = -math.cos(math.radians(angle))
         elif angle <= 180:
             offset.x = math.cos(math.radians(angle - 90))
             offset.y = math.sin(math.radians(angle - 90))
@@ -104,10 +112,40 @@ class Game:
         else:
             offset.x = -math.cos(math.radians(angle - 270))
             offset.y = -math.sin(math.radians(angle - 270))
+
         return offset
+
+    def shoot(self):
+        keys = pygame.key.get_pressed()
+        bulletDirection = Pos(0, 0)
+        if keys[pygame.K_UP]:
+            bulletDirection.y -= 1
+        if keys[pygame.K_DOWN]:
+            bulletDirection.y += 1
+        if keys[pygame.K_LEFT]:
+            bulletDirection.x -= 1
+        if keys[pygame.K_RIGHT]:
+            bulletDirection.x += 1
+
+
+
+        if bulletDirection.len() > 0:
+            bulletDirection = bulletDirection.normalized()
+            self.lastShootingDirection = bulletDirection
+            self.bullets.append(Bullet(self.player.pos, bulletDirection))
+        if bulletDirection.len() == 0 and keys[pygame.K_UP]:
+            self.bullets.append(Bullet(self.player.pos, self.lastShootingDirection))
+
+
+
+    def bulletAi(self):
+        for bullet in self.bullets:
+            bullet.move()
 
     def run(self):
         self.player.move()
+        self.shoot()
+        self.bulletAi()
         self.allyAi()
         self.enemyAi()
         self.draw()

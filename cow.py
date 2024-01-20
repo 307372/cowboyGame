@@ -6,8 +6,8 @@ class Cow:
 
     def __init__(self, x, y):
         self.pos = Pos(x, y)
-        self.width = 100
-        self.height = 100
+        self.width = 50
+        self.height = 50
         self.origin = Pos(self.width / 2, self.height / 2)
         self.movementSpeed = 2
 

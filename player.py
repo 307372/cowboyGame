@@ -6,7 +6,7 @@ class Player:
         self.pos = Pos(0, 0)
         self.movementSpeed = 5
         self.width = 50
-        self.height = 100
+        self.height = 75
         self.texture = pygame.image.load("img/sprite_05.png")
         self.origin = Pos(self.width / 2, self.height / 2)
         if not self.texture:
