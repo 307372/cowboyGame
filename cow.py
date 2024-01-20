@@ -6,6 +6,9 @@ class Cow:
 
     def __init__(self, x, y):
         self.pos = Pos(x, y)
+        self.width = 100
+        self.height = 100
+        self.origin = Pos(self.width / 2, self.height / 2)
         self.movementSpeed = 2
 
         # Load the texture only once if it's not already loaded
@@ -13,10 +16,11 @@ class Cow:
             Cow.texture = pygame.image.load("img/cow.gif")  # Replace with the actual path
 
         # Scale the texture to 200x200 pixels
-        self.texture = pygame.transform.scale(Cow.texture, (200, 200))
+        self.texture = pygame.transform.scale(Cow.texture, (self.width, self.height))
 
     def draw(self):
-        pygame.display.get_surface().blit(self.texture, (self.pos.x, self.pos.y))
+        drawPos = self.pos - self.origin
+        pygame.display.get_surface().blit(self.texture, (drawPos.x, drawPos.y))
 
     def moveTowards(self, target):
         # will follow player in formation
