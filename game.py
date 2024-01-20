@@ -11,7 +11,7 @@ import random
 import math
 
 pygame.font.init()
-my_font = pygame.font.SysFont('Comic Sans MS', 30)
+font = pygame.font.SysFont("geneva", 20)
 class Game:
     def __init__(self, screen):
         self.screen = screen
@@ -52,9 +52,7 @@ class Game:
         for bullet in self.bullets:
             bullet.draw(cameraOffset)
         for cowIndex in range(len(self.cows)):
-            text_surface = my_font.render(str(cowIndex), False, (0,0,0))
             self.cows[cowIndex].draw(cameraOffset)
-            self.screen.blit(text_surface, (self.cows[cowIndex].pos.x+cameraOffset.x, self.cows[cowIndex].pos.y+cameraOffset.y))
 
     def allyAi(self):
         for i in range(len(self.cows)):
@@ -162,6 +160,12 @@ class Game:
             for cowIndex in cowsToRemove:
                 self.cows.pop(cowIndex)
 
+    def updateMilk(self):
+        start_time = pygame.time.get_ticks()
+        elapsed_time = (pygame.time.get_ticks() - start_time) // 1000
+        text = font.render(f"{elapsed_time} milk", True, (245, 255, 230))
+        self.screen.blit(text, (text.get_width() // 2, text.get_height() // 2))
+
     def removeExpiredBullets(self):
         bulletsToRemove = []
         for bulletIndex in range(len(self.bullets)):
@@ -176,4 +180,5 @@ class Game:
         self.allyAi()
         self.enemyAi()
         self.draw()
+        self.updateMilk()
         self.frameCounter += 1
