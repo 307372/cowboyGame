@@ -55,10 +55,33 @@ class Game:
             self.cows[i].moveTowards(self.player.pos + self.getCowRingFormationPlayerOffset(len(self.cows), i))
 
     def enemyAi(self):
-        pass
-        # for enemy in enemies:
-        # for i in range(len(self.cows)):
-        #     self.cows[i].moveTowards(self.player.pos + self.getCowRingFormationPlayerOffset(len(self.cows), i))
+        cowsToRemove = []
+        enemiesToRemove = []
+        for enemyIndex in range(len(self.enemies)):
+            minDist = 1000000
+            minCowIndex = self.player.pos
+            for cowIndex in range(len(self.cows)):
+                dist = Pos.len(self.enemies[enemyIndex].pos - self.cows[cowIndex].pos)
+                if dist < minDist:
+                    minDist = dist
+                    minCowIndex = cowIndex
+            if minDist != 1000000:
+                self.enemies[enemyIndex].moveTowards(self.cows[minCowIndex].pos)
+                dist = Pos.len(self.enemies[enemyIndex].pos - self.cows[minCowIndex].pos)
+                if dist < self.enemies[enemyIndex].range:
+                    enemiesToRemove.append(enemyIndex)
+                    cowsToRemove.append(minCowIndex)
+        if len(cowsToRemove):
+            cowsToRemove = sorted(list(dict.fromkeys(cowsToRemove)), reverse=True)
+            for cowIndex in cowsToRemove:
+                self.cows.pop(cowIndex)
+
+        if len(enemiesToRemove):
+            enemiesToRemove = sorted(list(dict.fromkeys(enemiesToRemove)), reverse=True)
+            for enemyIndex in enemiesToRemove:
+                self.enemies.pop(enemyIndex)
+
+
 
     def getCowRingFormationPlayerOffset(self, amountOfCows, cowNumber):
         radius = 200

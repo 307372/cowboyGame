@@ -16,3 +16,6 @@ class Pos():
 
     def len(self):
         return math.sqrt(self.x*self.x + self.y*self.y)
+
+    def __str__(self):
+        return '(x=' + str(self.x) + ',y=' + str(self.y) + ')'

@@ -10,6 +10,7 @@ class Enemy:
         self.width = 100
         self.height = 100
         self.origin = Pos(self.width / 2, self.height / 2)
+        self.range = self.width / 2
         self.movementSpeed = 2
 
         if not Enemy.texture:
