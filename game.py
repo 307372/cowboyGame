@@ -5,6 +5,7 @@ from player import Player
 from cow import Cow
 from enemy import Enemy
 from pos import Pos
+from rock import Rock
 import random
 import math
 
@@ -15,8 +16,16 @@ class Game:
         self.cows = [Cow(random.randrange(0, 1000) - 500, random.randrange(0, 1000) - 500) for i in range(12)]
         self.player = Player()
         self.enemies = [Enemy(self.getValidEnemySpawnLocation()) for i in range(12)]
+        self.rocks = [Rock(self.getValidRockSpawnLocation()) for i in range(12)]
 
     def getValidEnemySpawnLocation(self):
+        angle = random.randrange(0, 360)
+        [x, y] = self.screen.get_size()
+        halfScreenDiagonal = Pos(x/2, y/2).len()
+        spawnOffset = self.getUnitaryVectorFromAngle(angle) * halfScreenDiagonal
+        return self.player.pos + spawnOffset
+
+    def getValidRockSpawnLocation(self):
         angle = random.randrange(0, 360)
         [x, y] = self.screen.get_size()
         halfScreenDiagonal = Pos(x/2, y/2).len()
@@ -36,6 +45,8 @@ class Game:
         self.player.draw(cameraOffset)
         for enemy in self.enemies:
             enemy.draw(cameraOffset)
+        for rock in self.rocks:
+            rock.draw(cameraOffset)
         for cow in self.cows:
             cow.draw(cameraOffset)
 

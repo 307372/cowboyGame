@@ -2,6 +2,9 @@ import pygame
 from pos import Pos
 
 class Enemy:
+    # Class attribute to store the loaded texture
+    texture = None
+
     def __init__(self, pos):
         self.pos = pos
         self.width = 100
@@ -9,10 +12,15 @@ class Enemy:
         self.origin = Pos(self.width / 2, self.height / 2)
         self.movementSpeed = 2
 
+        if not Enemy.texture:
+            Enemy.texture = pygame.image.load("img/howl.png")  # Replace with the actual path
+
+        # Scale the texture to 200x200 pixels
+        self.texture = pygame.transform.scale(Enemy.texture, (self.width, self.height))
+
     def draw(self, cameraOffset):
         drawPos = self.pos - self.origin + cameraOffset
-        #pygame.display.get_surface().blit(self.texture, (drawPos.x, drawPos.y))
-        pygame.draw.rect(pygame.display.get_surface(), (0,0,0), pygame.Rect(drawPos.x, drawPos.y, 50, 50))
+        pygame.display.get_surface().blit(self.texture, (drawPos.x, drawPos.y))
 
     def moveTowards(self, target):
         # will move towards target
