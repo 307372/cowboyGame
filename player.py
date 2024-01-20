@@ -9,11 +9,11 @@ class Player:
         self.height = 75
         self.texture = pygame.image.load("img/sprite_05.png")
         self.origin = Pos(self.width / 2, self.height / 2)
+
         if not self.texture:
             # Load the texture only once if it's not already loaded
             Player.texture = pygame.image.load("img/sprite_05.png")  # Replace with the actual path
 
-        # Scale the texture to 20x20 pixels
         self.texture = pygame.transform.scale(self.texture, (self.width, self.height))
 
 

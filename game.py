@@ -1,12 +1,11 @@
 import pygame
-
-import player
 from player import Player
 from cow import Cow
 from enemy import Enemy
 from pos import Pos
 from rock import Rock
 from bullet import Bullet
+from shop import Shop
 import random
 import math
 
@@ -20,9 +19,13 @@ class Game:
         self.player = Player()
         self.enemies = [Enemy(self.getValidEnemySpawnLocation()) for i in range(12)]
         self.rocks = [Rock(self.getValidRockSpawnLocation()) for i in range(12)]
+        self.shop = Shop(self.getValidRockSpawnLocation())
         self.bullets = []
         self.lastShootingDirection = Pos(0,1)
         self.frameCounter = 0
+        self.isInShop = False
+        self.milk = 0
+
     def getValidEnemySpawnLocation(self):
         angle = random.randrange(0, 360)
         [x, y] = self.screen.get_size()
@@ -51,8 +54,11 @@ class Game:
             rock.draw(cameraOffset)
         for bullet in self.bullets:
             bullet.draw(cameraOffset)
-        for cowIndex in range(len(self.cows)):
-            self.cows[cowIndex].draw(cameraOffset)
+        for cow in self.cows:
+            cow.draw(cameraOffset)
+
+        self.shop.draw(cameraOffset)
+        self.drawMilkCounter()
 
     def allyAi(self):
         for i in range(len(self.cows)):
@@ -161,9 +167,10 @@ class Game:
                 self.cows.pop(cowIndex)
 
     def updateMilk(self):
-        start_time = pygame.time.get_ticks()
-        elapsed_time = (pygame.time.get_ticks() - start_time) // 1000
-        text = font.render(f"{elapsed_time} milk", True, (245, 255, 230))
+        self.milk += len(self.cows) / 60
+
+    def drawMilkCounter(self):
+        text = font.render(f"{math.floor(self.milk)} milk", True, (245, 255, 230))
         self.screen.blit(text, (text.get_width() // 2, text.get_height() // 2))
 
     def removeExpiredBullets(self):
@@ -172,6 +179,19 @@ class Game:
             if self.bullets[bulletIndex].isExpired(self.frameCounter):
                 bulletsToRemove.append(bulletIndex)
         self.removeBullets(bulletsToRemove)
+
+    def spawnEnemies(self, amount):
+        for i in range(amount):
+            self.enemies.append(Enemy(self.getValidEnemySpawnLocation()))
+
+    def moveShopToRandomLocation(self):
+        self.shop = Shop(self.getValidRockSpawnLocation())
+
+
+    def openShopIfClose(self):
+        if Pos.len(self.shop.pos - self.player.pos) < self.shop.hitboxRadius:
+            self.isInShop = True
+
     def run(self):
         self.player.move()
         self.shoot()
@@ -179,6 +199,10 @@ class Game:
         self.removeExpiredBullets()
         self.allyAi()
         self.enemyAi()
-        self.draw()
         self.updateMilk()
+        self.openShopIfClose()
+        if self.frameCounter % 30 == 0 and len(self.enemies) < 30:
+            self.spawnEnemies(1)
+
+        self.draw()
         self.frameCounter += 1

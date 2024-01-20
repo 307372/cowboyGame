@@ -4,6 +4,7 @@
 import pygame
 from player import Player
 from game import Game
+from shopMenu import ShopMenu
 pygame.init()
 FPS = 60
 
@@ -15,9 +16,11 @@ pygame.mixer.music.load(file)
 pygame.mixer.music.play()
 pygame.event.wait()
 
-# Set up the drawing window
+
 screen = pygame.display.set_mode([1000, 1000], vsync=1)
 game = Game(screen)
+shopMenu = ShopMenu(game)
+
 clock = pygame.time.Clock()
 running = True
 while running:
@@ -26,7 +29,11 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-    game.run()
+    if not game.isInShop:
+        game.run()
+    else:
+        shopMenu.run()
+
     pygame.display.flip()
 # Done! Time to quit.
 pygame.quit()
