@@ -10,13 +10,18 @@ class Game:
 
     def __init__(self, screen):
         self.screen = screen
-        self.cows = [Cow(random.randrange(0, 1000), random.randrange(0, 1000)) for i in range(12)]
+        self.cows = [Cow(random.randrange(0, 1000) - 500, random.randrange(0, 1000) - 500) for i in range(12)]
     player = Player()
+
+    def getCameraOffset(self):
+        [width, height] = self.screen.get_size()
+        return Pos(width/2, height/2) - self.player.pos
     def draw(self):
         self.screen.fill((255, 255, 255))
-        self.player.draw()
+        cameraOffset = self.getCameraOffset()
+        self.player.draw(cameraOffset)
         for cow in self.cows:
-            cow.draw()
+            cow.draw(cameraOffset)
 
     def allyAi(self):
         for i in range(len(self.cows)):
@@ -40,6 +45,9 @@ class Game:
             offset.x = -math.cos(math.radians(angle - 270)) * radius
             offset.y = -math.sin(math.radians(angle - 270)) * radius
         return offset
+
+
+
 
     def run(self):
         self.player.move()

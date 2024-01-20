@@ -18,8 +18,8 @@ class Cow:
         # Scale the texture to 200x200 pixels
         self.texture = pygame.transform.scale(Cow.texture, (self.width, self.height))
 
-    def draw(self):
-        drawPos = self.pos - self.origin
+    def draw(self, cameraOffset):
+        drawPos = self.pos - self.origin + cameraOffset
         pygame.display.get_surface().blit(self.texture, (drawPos.x, drawPos.y))
 
     def moveTowards(self, target):

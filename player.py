@@ -3,7 +3,7 @@ from pos import Pos
 
 class Player:
     def __init__(self):
-        self.pos = Pos(500, 500)
+        self.pos = Pos(0, 0)
         self.movementSpeed = 5
         self.width = 50
         self.height = 100
@@ -18,8 +18,8 @@ class Player:
 
 
 
-    def draw(self):
-        drawPos = self.pos - self.origin
+    def draw(self, cameraOffset):
+        drawPos = self.pos - self.origin + cameraOffset
         pygame.display.get_surface().blit(self.texture, (drawPos.x, drawPos.y))
         # pygame.draw.rect(pygame.display.get_surface(), (0,255,0), pygame.Rect(self.pos.x-1.25, self.pos.y-1.25, 5, 5))
         # pygame.draw.rect(pygame.display.get_surface(), (255,0,0), pygame.Rect(self.pos.x, self.pos.y, 1, 1))
