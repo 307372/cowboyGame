@@ -19,7 +19,7 @@ class Cow:
         pygame.display.get_surface().blit(self.texture, (self.pos.x, self.pos.y))
 
     def moveTowards(self, target):
-        # will follow player
+        # will follow player in formation
         movement = Pos(0, 0)
         if self.pos.x > target.x:
             movement.x -= self.movementSpeed
@@ -29,6 +29,9 @@ class Cow:
             movement.y -= self.movementSpeed
         elif self.pos.y < target.y:
             movement.y += self.movementSpeed
-        self.pos += movement
+        if Pos.len(target - self.pos) > movement.len():
+            self.pos += movement
+        else:
+            self.pos = target
 
 

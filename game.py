@@ -10,7 +10,7 @@ class Game:
 
     def __init__(self, screen):
         self.screen = screen
-        self.cows = [Cow(random.randrange(0, 1000), random.randrange(0, 1000)) for i in range(60)]
+        self.cows = [Cow(random.randrange(0, 1000), random.randrange(0, 1000)) for i in range(12)]
     player = Player()
     def draw(self):
         self.screen.fill((255, 255, 255))
@@ -28,15 +28,17 @@ class Game:
         angle = deg*cowNumber
         offset = Pos(0,0)
         if angle <= 90:
-            offset.x = math.cos(angle) * radius
-            offset.y = math.sin(angle) * radius
+            offset.x = math.cos(math.radians(angle)) * radius
+            offset.y = -math.sin(math.radians(angle)) * radius
         elif angle <= 180:
-            offset.x = math.cos(angle - 90) * radius
-            offset.y = -math.sin(angle - 90) * radius
+            offset.x = math.cos(math.radians(angle - 90)) * radius
+            offset.y = math.sin(math.radians(angle - 90)) * radius
         elif angle <= 270:
-            pass
+            offset.x = -math.sin(math.radians(angle - 180)) * radius
+            offset.y = math.cos(math.radians(angle - 180)) * radius
         else:
-            pass
+            offset.x = -math.cos(math.radians(angle - 270)) * radius
+            offset.y = -math.sin(math.radians(angle - 270)) * radius
         return offset
 
     def run(self):
