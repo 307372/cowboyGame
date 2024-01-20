@@ -12,6 +12,7 @@ class Enemy:
         self.origin = Pos(self.width / 2, self.height / 2)
         self.range = self.width / 2
         self.movementSpeed = 2
+        self.hitboxRadius = (self.width / 2 + self.origin.len()) / 2
 
         if not Enemy.texture:
             Enemy.texture = pygame.image.load("img/howl.png")  # Replace with the actual path

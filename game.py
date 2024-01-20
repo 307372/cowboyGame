@@ -22,6 +22,7 @@ class Game:
         self.rocks = [Rock(self.getValidRockSpawnLocation()) for i in range(12)]
         self.bullets = []
         self.lastShootingDirection = Pos(0,1)
+        self.frameCounter = 0
     def getValidEnemySpawnLocation(self):
         angle = random.randrange(0, 360)
         [x, y] = self.screen.get_size()
@@ -41,10 +42,7 @@ class Game:
         return Pos(width / 2, height / 2) - self.player.pos
 
     def draw(self):
-        # Draw the background
         self.screen.blit(self.background_texture, (0, 0))
-
-        # Draw player and cows on top of the background
         cameraOffset = self.getCameraOffset()
         self.player.draw(cameraOffset)
         for enemy in self.enemies:
@@ -79,15 +77,8 @@ class Game:
                 if dist < self.enemies[enemyIndex].range:
                     enemiesToRemove.append(enemyIndex)
                     cowsToRemove.append(minCowIndex)
-        if len(cowsToRemove):
-            cowsToRemove = sorted(list(dict.fromkeys(cowsToRemove)), reverse=True)
-            for cowIndex in cowsToRemove:
-                self.cows.pop(cowIndex)
-
-        if len(enemiesToRemove):
-            enemiesToRemove = sorted(list(dict.fromkeys(enemiesToRemove)), reverse=True)
-            for enemyIndex in enemiesToRemove:
-                self.enemies.pop(enemyIndex)
+        self.removeCows(cowsToRemove)
+        self.removeEnemies(enemiesToRemove)
 
 
 
@@ -127,25 +118,62 @@ class Game:
         if keys[pygame.K_RIGHT]:
             bulletDirection.x += 1
 
-
-
         if bulletDirection.len() > 0:
             bulletDirection = bulletDirection.normalized()
             self.lastShootingDirection = bulletDirection
-            self.bullets.append(Bullet(self.player.pos, bulletDirection))
-        if bulletDirection.len() == 0 and keys[pygame.K_UP]:
-            self.bullets.append(Bullet(self.player.pos, self.lastShootingDirection))
+            self.bullets.append(Bullet(self.player.pos, bulletDirection, self.frameCounter))
+        elif bulletDirection.len() == 0 and keys[pygame.K_UP]:
+            self.bullets.append(Bullet(self.player.pos, self.lastShootingDirection, self.frameCounter))
 
 
 
     def bulletAi(self):
-        for bullet in self.bullets:
-            bullet.move()
+        bulletsToRemove = []
+        for bulletIndex in range(len(self.bullets)):
+            self.bullets[bulletIndex].move()
 
+            for rock in self.rocks:
+                if Pos.len(rock.pos - self.bullets[bulletIndex].pos) < rock.hitboxRadius:
+                    bulletsToRemove.append(bulletIndex)
+
+            enemiesToRemove = []
+            for enemyIndex in range(len(self.enemies)):
+                if Pos.len(self.enemies[enemyIndex].pos - self.bullets[bulletIndex].pos) < self.enemies[enemyIndex].hitboxRadius:
+                    enemiesToRemove.append(enemyIndex)
+
+            self.removeEnemies(enemiesToRemove)
+        self.removeBullets(bulletsToRemove)
+
+    def removeBullets(self, bulletsToRemove):
+        if len(bulletsToRemove):
+            bulletsToRemove = sorted(list(dict.fromkeys(bulletsToRemove)), reverse=True)
+            for bulletIndex in bulletsToRemove:
+                self.bullets.pop(bulletIndex)
+
+    def removeEnemies(self, enemiesToRemove):
+        if len(enemiesToRemove):
+            enemiesToRemove = sorted(list(dict.fromkeys(enemiesToRemove)), reverse=True)
+            for enemyIndex in enemiesToRemove:
+                self.enemies.pop(enemyIndex)
+
+    def removeCows(self, cowsToRemove):
+        if len(cowsToRemove):
+            cowsToRemove = sorted(list(dict.fromkeys(cowsToRemove)), reverse=True)
+            for cowIndex in cowsToRemove:
+                self.cows.pop(cowIndex)
+
+    def removeExpiredBullets(self):
+        bulletsToRemove = []
+        for bulletIndex in range(len(self.bullets)):
+            if self.bullets[bulletIndex].isExpired(self.frameCounter):
+                bulletsToRemove.append(bulletIndex)
+        self.removeBullets(bulletsToRemove)
     def run(self):
         self.player.move()
         self.shoot()
         self.bulletAi()
+        self.removeExpiredBullets()
         self.allyAi()
         self.enemyAi()
         self.draw()
+        self.frameCounter += 1

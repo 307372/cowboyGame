@@ -2,15 +2,16 @@ import pygame
 from pos import Pos
 
 
-
+BULLET_LIFESPAN = 5 * 60
 class Bullet:
-    def __init__(self, position, directionVector):
+    def __init__(self, position, directionVector, currentFrame):
         self.pos = position
         self.height = 5
         self.width = 5
         self.origin = Pos(self.width / 2, self.height / 2)
         self.direction = directionVector
         self.movementSpeed = 10
+        self.despawnFrame = currentFrame + BULLET_LIFESPAN
 
 
     def draw(self, cameraOffset):
@@ -19,3 +20,6 @@ class Bullet:
 
     def move(self):
         self.pos += self.direction * self.movementSpeed
+
+    def isExpired(self, currentFrame):
+        return currentFrame > self.despawnFrame

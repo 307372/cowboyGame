@@ -9,6 +9,7 @@ class Rock:
         self.width = 100
         self.height = 100
         self.origin = Pos(self.width / 2, self.height / 2)
+        self.hitboxRadius = (self.width / 2 + self.origin.len()) / 2
 
         if not Rock.texture:
             Rock.texture = pygame.image.load("img/rock.png")  # Replace with the actual path
