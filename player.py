@@ -5,8 +5,6 @@ class Player:
     def __init__(self):
         self.pos = Pos(500, 500)
         self.movementSpeed = 5
-    def __init__(self):
-        self.pos = Pos(500,500)
         self.width = 50
         self.height = 100
         self.texture = pygame.image.load("img/sprite_05.png")
