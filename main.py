@@ -7,6 +7,13 @@ from game import Game
 pygame.init()
 FPS = 60
 
+# Initialize Pygame mixer
+file = 'music/1.mp3'
+pygame.init()
+pygame.mixer.init()
+pygame.mixer.music.load(file)
+pygame.mixer.music.play()
+pygame.event.wait()
 
 # Set up the drawing window
 screen = pygame.display.set_mode([1000, 1000], vsync=1)

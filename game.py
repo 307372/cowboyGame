@@ -6,18 +6,21 @@ import random
 import math
 
 class Game:
-    screen = 0
-
     def __init__(self, screen):
         self.screen = screen
+        self.background_texture = pygame.image.load("img/grass_11.png")  # Replace with your background image path
         self.cows = [Cow(random.randrange(0, 1000) - 500, random.randrange(0, 1000) - 500) for i in range(12)]
-    player = Player()
+        self.player = Player()
 
     def getCameraOffset(self):
         [width, height] = self.screen.get_size()
-        return Pos(width/2, height/2) - self.player.pos
+        return Pos(width / 2, height / 2) - self.player.pos
+
     def draw(self):
-        self.screen.fill((255, 255, 255))
+        # Draw the background
+        self.screen.blit(self.background_texture, (0, 0))
+
+        # Draw player and cows on top of the background
         cameraOffset = self.getCameraOffset()
         self.player.draw(cameraOffset)
         for cow in self.cows:
@@ -29,9 +32,9 @@ class Game:
 
     def getCowRingFormationPlayerOffset(self, amountOfCows, cowNumber):
         radius = 200
-        deg = 360/amountOfCows
-        angle = deg*cowNumber
-        offset = Pos(0,0)
+        deg = 360 / amountOfCows
+        angle = deg * cowNumber
+        offset = Pos(0, 0)
         if angle <= 90:
             offset.x = math.cos(math.radians(angle)) * radius
             offset.y = -math.sin(math.radians(angle)) * radius
@@ -46,11 +49,7 @@ class Game:
             offset.y = -math.sin(math.radians(angle - 270)) * radius
         return offset
 
-
-
-
     def run(self):
         self.player.move()
         self.allyAi()
         self.draw()
-
