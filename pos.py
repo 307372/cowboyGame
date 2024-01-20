@@ -11,5 +11,8 @@ class Pos():
     def __sub__(self, other):
         return Pos(self.x - other.x, self.y - other.y)
 
+    def __mul__(self, value):
+        return Pos(self.x * value, self.y * value)
+
     def len(self):
         return math.sqrt(self.x*self.x + self.y*self.y)
