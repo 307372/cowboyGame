@@ -15,7 +15,7 @@ class Game:
     def __init__(self, screen):
         self.screen = screen
         self.background_texture = pygame.image.load("img/grass_11.png")  # Replace with your background image path
-        self.cows = [Cow(random.randrange(0, 1000) - 500, random.randrange(0, 1000) - 500) for i in range(12)]
+        self.cows = [Cow(random.randrange(0, 1000) - 500, random.randrange(0, 1000) - 500, False) for i in range(12)]
         self.player = Player()
         self.enemies = [Enemy(self.getValidEnemySpawnLocation()) for i in range(12)]
         self.rocks = [Rock(self.getValidRockSpawnLocation()) for i in range(12)]
@@ -25,6 +25,10 @@ class Game:
         self.frameCounter = 0
         self.isInShop = False
         self.milk = 0
+        self.cowShootingDelay = 10
+        self.nextCowShootableFrame = 0
+        self.isCowUpgradeBought = False
+
 
     def getValidEnemySpawnLocation(self):
         angle = random.randrange(0, 360)
@@ -110,26 +114,35 @@ class Game:
 
         return offset
 
-    def shoot(self):
-        keys = pygame.key.get_pressed()
-        bulletDirection = Pos(0, 0)
-        if keys[pygame.K_UP]:
-            bulletDirection.y -= 1
-        if keys[pygame.K_DOWN]:
-            bulletDirection.y += 1
-        if keys[pygame.K_LEFT]:
-            bulletDirection.x -= 1
-        if keys[pygame.K_RIGHT]:
-            bulletDirection.x += 1
+    def playerShoot(self):
+        if self.player.nextShootableFrame < self.frameCounter:
+            keys = pygame.key.get_pressed()
+            bulletDirection = Pos(0, 0)
+            if keys[pygame.K_UP]:
+                bulletDirection.y -= 1
+            if keys[pygame.K_DOWN]:
+                bulletDirection.y += 1
+            if keys[pygame.K_LEFT]:
+                bulletDirection.x -= 1
+            if keys[pygame.K_RIGHT]:
+                bulletDirection.x += 1
 
-        if bulletDirection.len() > 0:
-            bulletDirection = bulletDirection.normalized()
-            self.lastShootingDirection = bulletDirection
-            self.bullets.append(Bullet(self.player.pos, bulletDirection, self.frameCounter))
-        elif bulletDirection.len() == 0 and keys[pygame.K_UP]:
-            self.bullets.append(Bullet(self.player.pos, self.lastShootingDirection, self.frameCounter))
+            if bulletDirection.len() > 0:
+                bulletDirection = bulletDirection.normalized()
+                self.lastShootingDirection = bulletDirection
+                self.bullets.append(Bullet(self.player.pos, bulletDirection, self.frameCounter))
+                self.player.updateNextShootableFrame(self.frameCounter)
+            elif bulletDirection.len() == 0 and keys[pygame.K_UP]:
+                self.bullets.append(Bullet(self.player.pos, self.lastShootingDirection, self.frameCounter))
+                self.player.updateNextShootableFrame(self.frameCounter)
 
 
+    def cowShoot(self):
+        if self.isCowUpgradeBought and self.nextCowShootableFrame < self.frameCounter:
+            for cowIndex in range(len(self.cows)):
+                bulletDirection = self.getCowRingFormationPlayerOffset(len(self.cows), cowIndex).normalized()
+                self.bullets.append(Bullet(self.cows[cowIndex].pos, bulletDirection, self.frameCounter))
+            self.nextCowShootableFrame = self.frameCounter + self.cowShootingDelay
 
     def bulletAi(self):
         bulletsToRemove = []
@@ -192,9 +205,22 @@ class Game:
         if Pos.len(self.shop.pos - self.player.pos) < self.shop.hitboxRadius:
             self.isInShop = True
 
+    def upgradeFireRate(self):
+        self.player.shootingDelay = 0
+
+    def upgradeCows(self):
+        self.isCowUpgradeBought = True
+        for cow in self.cows:
+            cow.upgrade()
+
+    def spawnCowsInShop(self, amount):
+        for i in range(amount):
+            self.cows.append(Cow(self.shop.pos.x, self.shop.pos.y, self.isCowUpgradeBought))
+
     def run(self):
         self.player.move()
-        self.shoot()
+        self.playerShoot()
+        self.cowShoot()
         self.bulletAi()
         self.removeExpiredBullets()
         self.allyAi()

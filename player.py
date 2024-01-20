@@ -9,6 +9,8 @@ class Player:
         self.height = 75
         self.texture = pygame.image.load("img/sprite_05.png")
         self.origin = Pos(self.width / 2, self.height / 2)
+        self.nextShootableFrame = 0
+        self.shootingDelay = 10
 
         if not self.texture:
             # Load the texture only once if it's not already loaded
@@ -16,7 +18,8 @@ class Player:
 
         self.texture = pygame.transform.scale(self.texture, (self.width, self.height))
 
-
+    def updateNextShootableFrame(self, currentFrame):
+        self.nextShootableFrame = currentFrame + self.shootingDelay
 
     def draw(self, cameraOffset):
         drawPos = self.pos - self.origin + cameraOffset
