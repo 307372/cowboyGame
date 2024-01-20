@@ -5,14 +5,16 @@ import pygame
 from player import Player
 from game import Game
 pygame.init()
+FPS = 60
+
 
 # Set up the drawing window
-screen = pygame.display.set_mode([1000, 1000])
+screen = pygame.display.set_mode([1000, 1000], vsync=1)
 game = Game(screen)
-
+clock = pygame.time.Clock()
 running = True
 while running:
-
+    clock.tick(60)
     # Did the user click the window close button?
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
